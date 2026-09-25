@@ -21,7 +21,6 @@
   --shadow-md: 0 2px 4px rgba(20, 20, 30, 0.04), 0 10px 28px rgba(20, 20, 30, 0.09);
   --toast-bg: #1c1c1e;
   --toast-fg: #f5f5f7;
-  --offline-bg: #fcf1d8; --offline-fg: #94650a;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -44,7 +43,6 @@
     --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
     --toast-bg: #2c2c31;
     --toast-fg: #f5f5f7;
-    --offline-bg: rgba(245, 180, 60, 0.15); --offline-fg: #f2c46d;
   }
 }
 :root[data-theme="dark"] {
@@ -67,7 +65,6 @@
   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
   --toast-bg: #2c2c31;
   --toast-fg: #f5f5f7;
-  --offline-bg: rgba(245, 180, 60, 0.15); --offline-fg: #f2c46d;
 }
 
 /* ---------- Base ---------- */
@@ -254,66 +251,8 @@ textarea.note-input::placeholder { color: var(--text-3); }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-.hidden { display: none !important; }
-
-/* ---------- Header actions & sync status ---------- */
-.header-actions { display: flex; align-items: center; gap: 4px; }
-.sync {
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 30px; padding: 0 11px; margin-right: 4px; border-radius: 999px;
-  font-size: 12.5px; font-weight: 600; white-space: nowrap;
-  background: var(--surface); border: 1px solid var(--border); color: var(--text-2);
-  transition: color 0.2s ease, background 0.2s ease;
-}
-.sync svg.icon { width: 14px; height: 14px; stroke-width: 2.3; }
-.sync.synced svg.icon { color: var(--upcoming-fg); }
-.sync.syncing { color: var(--accent); }
-.sync.syncing svg.icon { animation: spin 0.9s linear infinite; }
-.sync.offline, .sync.error { background: var(--offline-bg); color: var(--offline-fg); border-color: transparent; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ---------- Login screen ---------- */
-.login {
-  min-height: calc(100vh - 100px); display: grid; place-items: center; padding: 20px 0 40px;
-  animation: fade-in 0.35s ease;
-}
-.login-card {
-  width: 100%; max-width: 380px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow-md);
-  padding: 36px 28px 28px; text-align: center;
-}
-.login-logo {
-  display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 18px;
-  border-radius: 16px; background: var(--accent-soft); color: var(--accent);
-}
-.login-logo svg.icon { width: 26px; height: 26px; }
-.login h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
-.login .lede { margin: 0 0 24px; font-size: 14.5px; color: var(--text-2); line-height: 1.5; }
-.field { position: relative; display: block; margin-bottom: 10px; text-align: left; }
-.field svg.icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-3); pointer-events: none; }
-.field input {
-  width: 100%; height: 44px; padding: 0 14px 0 38px; border-radius: 12px;
-  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
-  font: inherit; font-size: 15px; transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.field input::placeholder { color: var(--text-3); }
-.field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
-.login .btn.primary { width: 100%; height: 44px; justify-content: center; margin-top: 8px; font-size: 15px; border-radius: 12px; }
-.login .btn.primary:disabled { opacity: 0.6; }
-.login-error {
-  display: none; align-items: center; gap: 8px; margin: 4px 0 10px; padding: 9px 12px; border-radius: 10px;
-  background: var(--overdue-bg); color: var(--overdue-fg); font-size: 13px; font-weight: 500; text-align: left;
-}
-.login-error.show { display: flex; animation: fade-in 0.2s ease; }
-.login-error svg.icon { width: 15px; height: 15px; }
-.login .fine { margin: 18px 0 0; font-size: 12.5px; color: var(--text-3); display: flex; align-items: center; justify-content: center; gap: 6px; }
-.login .fine svg.icon { width: 13px; height: 13px; }
-
 @media (max-width: 480px) {
   .page { padding-top: 24px; }
   .app-header h1 { font-size: 28px; }
   .hint { display: none; }
-  .sync .label { display: none; }
-  .sync { padding: 0 8px; }
-  .login-card { padding: 30px 20px 22px; }
 }

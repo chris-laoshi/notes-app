@@ -11,24 +11,49 @@
 </head>
 <body>
   <div class="page">
-    <header class="app-header">
-      <div>
-        <h1>Notes</h1>
-        <p class="subtitle" id="today-label"></p>
-      </div>
-      <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode"></button>
-    </header>
+    <section class="login hidden" id="login-view">
+      <form class="login-card" id="login-form" novalidate>
+        <div class="login-logo" id="login-logo"></div>
+        <h2>Welcome back</h2>
+        <p class="lede">Sign in to see your notes on every device.</p>
+        <div class="login-error" id="login-error" role="alert"></div>
+        <label class="field">
+          <span data-icon="mail"></span>
+          <input type="email" id="login-email" placeholder="Email" autocomplete="username" />
+        </label>
+        <label class="field">
+          <span data-icon="lock"></span>
+          <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+        </label>
+        <button type="submit" class="btn primary" id="login-submit">Sign in</button>
+        <p class="fine" id="login-fine"></p>
+      </form>
+    </section>
 
-    <form class="composer" id="composer">
-      <textarea class="note-input" id="composer-input" rows="1" placeholder="What's on your mind?"></textarea>
-      <div class="input-row" id="composer-row">
-        <span class="spacer"></span>
-        <span class="hint"><kbd>Enter</kbd> to save · <kbd>Shift</kbd>+<kbd>Enter</kbd> new line</span>
-        <button type="submit" class="btn primary" id="composer-add" disabled></button>
-      </div>
-    </form>
+    <div class="hidden" id="app-view">
+      <header class="app-header">
+        <div>
+          <h1>Notes</h1>
+          <p class="subtitle" id="today-label"></p>
+        </div>
+        <div class="header-actions">
+          <span class="sync synced" id="sync-status" role="status"></span>
+          <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode"></button>
+          <button class="icon-btn" id="sign-out" aria-label="Sign out"></button>
+        </div>
+      </header>
 
-    <main id="list-root"></main>
+      <form class="composer" id="composer">
+        <textarea class="note-input" id="composer-input" rows="1" placeholder="What's on your mind?"></textarea>
+        <div class="input-row" id="composer-row">
+          <span class="spacer"></span>
+          <span class="hint"><kbd>Enter</kbd> to save · <kbd>Shift</kbd>+<kbd>Enter</kbd> new line</span>
+          <button type="submit" class="btn primary" id="composer-add" disabled></button>
+        </div>
+      </form>
+
+      <main id="list-root"></main>
+    </div>
   </div>
 
   <div class="toast" id="toast" role="status">

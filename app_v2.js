@@ -1,14 +1,6 @@
-import { storage } from './storage_v2.js';
+import { storage } from './storage.js';
 import { createNote, noteText, updateNote } from './notes.js';
-import { icon } from './icons_v2.js';
-
-const loginView = document.getElementById('login-view');
-const appView = document.getElementById('app-view');
-const loginForm = document.getElementById('login-form');
-const loginEmail = document.getElementById('login-email');
-const loginPassword = document.getElementById('login-password');
-const loginError = document.getElementById('login-error');
-const loginSubmit = document.getElementById('login-submit');
+import { icon } from './icons.js';
 
 const listRoot = document.getElementById('list-root');
 const composer = document.getElementById('composer');
@@ -18,129 +10,21 @@ const composerRow = document.getElementById('composer-row');
 const toast = document.getElementById('toast');
 const undoButton = document.getElementById('undo');
 const themeButton = document.getElementById('theme-toggle');
-const signOutButton = document.getElementById('sign-out');
-const syncStatus = document.getElementById('sync-status');
 
 let notes = [];
 let editingId = null;
 let completedCollapsed = false;
 let pendingUndo = null; // { note, timeoutId }
-let refreshPending = false; // notes changed on another device while editing
 
 async function init() {
   await storage.requestPersistence();
-
-  storage.on('status', paintSyncStatus);
-  storage.on('change', refreshFromStorage);
-  storage.on('signedOut', () => showLogin('You’ve been signed out. Please sign in again.'));
-
-  if (storage.isSignedIn()) showApp();
-  else showLogin();
-}
-
-// ---------- Views ----------
-
-async function showApp() {
-  loginView.classList.add('hidden');
-  appView.classList.remove('hidden');
-  signOutButton.title = `Sign out (${storage.userEmail() || 'signed in'})`;
-  paintSyncStatus(navigator.onLine ? storage.status() : 'offline');
-  notes = await storage.getAllNotes();
-  render();
-  storage.sync();
-}
-
-function showLogin(message = '') {
-  appView.classList.add('hidden');
-  loginView.classList.remove('hidden');
-  toast.classList.remove('show');
-  editingId = null;
-  notes = [];
-  loginSubmit.disabled = false;
-  loginSubmit.textContent = 'Sign in';
-  loginPassword.value = '';
-  showLoginError(message);
-  loginEmail.focus();
-}
-
-function showLoginError(message) {
-  loginError.innerHTML = message ? `${icon('alert')}<span></span>` : '';
-  if (message) loginError.querySelector('span').textContent = message;
-  loginError.classList.toggle('show', !!message);
-}
-
-// ---------- Login & sign out ----------
-
-document.getElementById('login-logo').innerHTML = icon('notebook');
-document.querySelectorAll('[data-icon]').forEach((el) => { el.outerHTML = icon(el.dataset.icon); });
-document.getElementById('login-fine').innerHTML = `${icon('shield')}Your notes are private to your account.`;
-signOutButton.innerHTML = icon('logOut');
-
-loginForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const email = loginEmail.value.trim();
-  const password = loginPassword.value;
-  if (!email || !password) {
-    showLoginError('Enter your email and password.');
-    return;
-  }
-
-  showLoginError('');
-  loginSubmit.disabled = true;
-  loginSubmit.textContent = 'Signing in…';
-  try {
-    await storage.signIn(email, password);
-    loginPassword.value = '';
-    showApp();
-  } catch (err) {
-    showLoginError(err.message);
-    loginSubmit.disabled = false;
-    loginSubmit.textContent = 'Sign in';
-  }
-});
-
-signOutButton.addEventListener('click', async () => {
-  let result = await storage.signOut();
-  if (result.unsynced) {
-    const ok = confirm(
-      'Some changes haven’t synced yet (you may be offline).\n\n' +
-      'If you sign out now, those changes will be lost. Sign out anyway?'
-    );
-    if (!ok) return;
-    result = await storage.signOut({ force: true });
-  }
-  showLogin();
-});
-
-// ---------- Sync status ----------
-
-const SYNC_STATES = {
-  synced: { icon: 'cloudCheck', label: 'Synced', title: 'All notes saved to the cloud' },
-  syncing: { icon: 'refresh', label: 'Syncing…', title: 'Saving changes to the cloud' },
-  offline: { icon: 'cloudOff', label: 'Offline', title: 'You’re offline. Changes are saved on this device and will sync when you’re back online.' },
-  error: { icon: 'cloudOff', label: 'Not synced', title: 'Can’t reach the sync server right now. Changes are saved on this device and will sync later.' },
-};
-
-function paintSyncStatus(state) {
-  const s = SYNC_STATES[state] || SYNC_STATES.synced;
-  syncStatus.className = `sync ${state}`;
-  syncStatus.title = s.title;
-  syncStatus.innerHTML = `${icon(s.icon)}<span class="label">${s.label}</span>`;
-}
-
-// Notes changed on another device. Re-read them — but not mid-edit, or the
-// editor would be thrown away; that waits until editing finishes.
-async function refreshFromStorage() {
-  if (appView.classList.contains('hidden')) return;
-  if (editingId !== null) {
-    refreshPending = true;
-    return;
-  }
   notes = await storage.getAllNotes();
   render();
 }
 
 // ---------- Dates ----------
+
+const pad = (n) => String(n).padStart(2, '0');
 
 function startOfToday() {
   const d = new Date();
@@ -348,16 +232,6 @@ function startEditing(id) {
   render();
 }
 
-// Leaves edit mode, first picking up any changes that synced in meanwhile.
-async function stopEditing() {
-  editingId = null;
-  if (refreshPending) {
-    refreshPending = false;
-    notes = await storage.getAllNotes();
-  }
-  render();
-}
-
 function renderEditor(note) {
   const card = document.createElement('article');
   card.className = 'card editing';
@@ -380,13 +254,18 @@ function renderEditor(note) {
     const text = ta.value.trim();
     if (!text) return;
     updateNote(note, { text, ...editDate.get() });
+    editingId = null;
     await storage.saveNote(note);
-    stopEditing();
+    render();
+  };
+  const cancel = () => {
+    editingId = null;
+    render();
   };
 
-  wireInput(ta, save, stopEditing);
+  wireInput(ta, save, cancel);
   card.querySelector('.save').addEventListener('click', save);
-  card.querySelector('.cancel').addEventListener('click', stopEditing);
+  card.querySelector('.cancel').addEventListener('click', cancel);
 
   requestAnimationFrame(() => {
     autoGrow(ta);
