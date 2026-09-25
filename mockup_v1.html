@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notes Mockup v1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ---------- Design tokens ---------- */
+    :root {
+      --bg: #f5f4f0;
+      --surface: #ffffff;
+      --surface-2: #faf9f6;
+      --text: #1c1c1e;
+      --text-2: #66666e;
+      --text-3: #a3a3aa;
+      --border: rgba(20, 20, 30, 0.07);
+      --accent: #4f6bed;
+      --accent-hover: #3f5ae0;
+      --accent-soft: #e9edfd;
+      --danger: #e5484d;
+      --danger-soft: #fdecec;
+
+      --today-bg: #e9edfd;    --today-fg: #3450d6;
+      --overdue-bg: #fde9e7;  --overdue-fg: #c9372c;
+      --upcoming-bg: #e2f4e8; --upcoming-fg: #1d7f46;
+
+      --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.04), 0 2px 8px rgba(20, 20, 30, 0.04);
+      --shadow-md: 0 2px 4px rgba(20, 20, 30, 0.04), 0 10px 28px rgba(20, 20, 30, 0.09);
+      --toast-bg: #1c1c1e;
+      --toast-fg: #f5f5f7;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #131315;
+        --surface: #1d1d20;
+        --surface-2: #232327;
+        --text: #ececef;
+        --text-2: #a0a0a8;
+        --text-3: #65656d;
+        --border: rgba(255, 255, 255, 0.07);
+        --accent: #7c93ff;
+        --accent-hover: #93a6ff;
+        --accent-soft: rgba(124, 147, 255, 0.15);
+        --danger: #ff6b6b;
+        --danger-soft: rgba(255, 107, 107, 0.14);
+        --today-bg: rgba(124, 147, 255, 0.16);   --today-fg: #a9b8ff;
+        --overdue-bg: rgba(255, 107, 107, 0.15); --overdue-fg: #ff9187;
+        --upcoming-bg: rgba(74, 222, 128, 0.13); --upcoming-fg: #6ee7a0;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
+        --toast-bg: #2c2c31;
+        --toast-fg: #f5f5f7;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #131315;
+      --surface: #1d1d20;
+      --surface-2: #232327;
+      --text: #ececef;
+      --text-2: #a0a0a8;
+      --text-3: #65656d;
+      --border: rgba(255, 255, 255, 0.07);
+      --accent: #7c93ff;
+      --accent-hover: #93a6ff;
+      --accent-soft: rgba(124, 147, 255, 0.15);
+      --danger: #ff6b6b;
+      --danger-soft: rgba(255, 107, 107, 0.14);
+      --today-bg: rgba(124, 147, 255, 0.16);   --today-fg: #a9b8ff;
+      --overdue-bg: rgba(255, 107, 107, 0.15); --overdue-fg: #ff9187;
+      --upcoming-bg: rgba(74, 222, 128, 0.13); --upcoming-fg: #6ee7a0;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
+      --toast-bg: #2c2c31;
+      --toast-fg: #f5f5f7;
+    }
+
+    /* ---------- Base ---------- */
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-feature-settings: "cv11", "ss01";
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    button { font: inherit; color: inherit; }
+    svg.icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+    .page { max-width: 680px; margin: 0 auto; padding: 20px 16px 120px; }
+
+    /* ---------- Mockup banner (not part of the design) ---------- */
+    .mockup-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      font-size: 12.5px; color: var(--text-2);
+      padding: 8px 12px; margin-bottom: 28px;
+      border: 1px dashed var(--border); border-radius: 12px;
+    }
+    .mockup-bar strong { color: var(--text); font-weight: 600; }
+    .mockup-bar .spacer { flex: 1; }
+    .mockup-bar button {
+      border: 1px solid var(--border); background: var(--surface); border-radius: 8px;
+      padding: 4px 10px; font-size: 12.5px; cursor: pointer;
+    }
+
+    /* ---------- Header ---------- */
+    .app-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 22px; }
+    .app-header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.025em; margin: 0; line-height: 1.1; }
+    .app-header .subtitle { margin: 6px 0 0; font-size: 14px; color: var(--text-2); font-weight: 500; }
+    .icon-btn {
+      display: inline-grid; place-items: center;
+      width: 36px; height: 36px; border-radius: 10px;
+      border: none; background: transparent; color: var(--text-2); cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+    .icon-btn:hover { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+    .icon-btn:active { transform: scale(0.94); }
+    .icon-btn.danger:hover { background: var(--danger-soft); color: var(--danger); box-shadow: none; }
+
+    /* ---------- Composer & editor (shared) ---------- */
+    .composer {
+      background: var(--surface); border-radius: 18px; padding: 14px 14px 12px 18px;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+      margin-bottom: 30px;
+    }
+    .composer:focus-within { box-shadow: var(--shadow-md), 0 0 0 4px var(--accent-soft); border-color: transparent; }
+    textarea.note-input {
+      display: block; width: 100%; resize: none; border: none; outline: none;
+      background: transparent; color: var(--text);
+      font: inherit; font-size: 15.5px; line-height: 1.5; padding: 4px 0; min-height: 30px; overflow: hidden;
+    }
+    textarea.note-input::placeholder { color: var(--text-3); }
+    .input-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .input-row .spacer { flex: 1; }
+    .hint { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+    .hint kbd {
+      font: inherit; font-size: 11px; font-weight: 600; color: var(--text-2);
+      padding: 1px 5px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--border);
+    }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 30px; padding: 0 10px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2);
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .chip svg.icon { width: 15px; height: 15px; }
+    .chip:hover { color: var(--text); border-color: var(--text-3); }
+    .chip.active { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+    .date-fields { display: none; align-items: center; gap: 6px; }
+    .date-fields.open { display: inline-flex; animation: fade-in 0.2s ease; }
+    .date-fields input {
+      height: 30px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text); font: inherit; font-size: 13px; padding: 0 8px;
+      color-scheme: light dark;
+    }
+    .date-fields input:focus { outline: none; border-color: var(--accent); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 34px; padding: 0 16px; border-radius: 10px; border: none;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn.primary { background: var(--accent); color: #fff; }
+    .btn.primary:hover { background: var(--accent-hover); }
+    .btn.primary:disabled { opacity: 0.4; cursor: default; transform: none; }
+    .btn.ghost { background: transparent; color: var(--text-2); }
+    .btn.ghost:hover { background: var(--surface-2); color: var(--text); }
+    .btn svg.icon { width: 16px; height: 16px; stroke-width: 2.4; }
+
+    /* ---------- Note list ---------- */
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .section-label {
+      display: flex; align-items: center; gap: 6px;
+      margin: 26px 0 10px; padding: 0 4px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3);
+      background: none; border: none; cursor: pointer;
+    }
+    .section-label svg.icon { width: 14px; height: 14px; transition: transform 0.2s ease; }
+    .section-label.collapsed svg.icon { transform: rotate(-90deg); }
+
+    .card {
+      position: relative; display: flex; align-items: flex-start; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 15px 12px 15px 16px; box-shadow: var(--shadow-sm); cursor: text;
+      transition: box-shadow 0.2s ease, transform 0.2s ease, opacity 0.3s ease, background 0.3s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .card.done { background: transparent; box-shadow: none; }
+    .card.done:hover { background: var(--surface); }
+
+    .check {
+      flex-shrink: 0; display: grid; place-items: center;
+      width: 22px; height: 22px; margin-top: 1px; border-radius: 50%;
+      border: 1.75px solid var(--text-3); background: transparent; color: transparent;
+      cursor: pointer; padding: 0;
+      transition: border-color 0.15s ease, background 0.2s ease, color 0.15s ease;
+    }
+    .check svg.icon { width: 13px; height: 13px; stroke-width: 3; }
+    .check:hover { border-color: var(--accent); color: var(--accent); }
+    .card.done .check { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .check.pop { animation: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1); }
+
+    .content { flex: 1; min-width: 0; }
+    .title { font-size: 15.5px; font-weight: 600; line-height: 1.4; letter-spacing: -0.005em; word-break: break-word; }
+    .body { margin-top: 3px; font-size: 14.5px; line-height: 1.55; color: var(--text-2); white-space: pre-wrap; word-break: break-word; }
+    .title, .body { transition: color 0.3s ease; }
+    .card.done .title, .card.done .body { color: var(--text-3); text-decoration: line-through; text-decoration-color: var(--text-3); }
+
+    .tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 24px; padding: 0 9px; border-radius: 999px;
+      font-size: 12px; font-weight: 600;
+    }
+    .tag svg.icon { width: 13px; height: 13px; stroke-width: 2.3; }
+    .tag.today { background: var(--today-bg); color: var(--today-fg); }
+    .tag.overdue { background: var(--overdue-bg); color: var(--overdue-fg); }
+    .tag.upcoming { background: var(--upcoming-bg); color: var(--upcoming-fg); }
+    .card.done .tag { background: var(--surface-2); color: var(--text-3); }
+
+    .actions { display: flex; gap: 2px; margin: -5px 0; opacity: 0; transition: opacity 0.15s ease; }
+    .card:hover .actions, .card:focus-within .actions { opacity: 1; }
+    @media (hover: none) { .actions { opacity: 0.7; } }
+    .actions .icon-btn { width: 32px; height: 32px; }
+    .actions .icon-btn svg.icon { width: 17px; height: 17px; }
+
+    /* Editing state */
+    .card.editing { cursor: default; box-shadow: var(--shadow-md), 0 0 0 4px var(--accent-soft); border-color: transparent; transform: none; animation: fade-in 0.2s ease; }
+    .card.editing .editor { flex: 1; min-width: 0; }
+
+    /* ---------- Empty state ---------- */
+    .empty { text-align: center; padding: 48px 20px 20px; animation: fade-in 0.4s ease; }
+    .empty svg { width: 120px; height: 120px; margin-bottom: 14px; }
+    .empty h2 { margin: 0 0 6px; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+    .empty p { margin: 0; font-size: 14.5px; color: var(--text-2); line-height: 1.5; }
+
+    /* ---------- Undo toast ---------- */
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px);
+      display: flex; align-items: center; gap: 14px;
+      background: var(--toast-bg); color: var(--toast-fg);
+      padding: 10px 10px 10px 16px; border-radius: 14px; font-size: 14px; font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      max-width: calc(100% - 32px);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+    .toast button { background: rgba(255, 255, 255, 0.12); border: none; color: #fff; font-weight: 600; font-size: 13px; padding: 6px 12px; border-radius: 9px; cursor: pointer; }
+    .toast button:hover { background: rgba(255, 255, 255, 0.2); }
+
+    /* ---------- Motion ---------- */
+    .enter { animation: enter 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+    .leaving {
+      overflow: hidden; opacity: 0; transform: scale(0.97);
+      padding-top: 0 !important; padding-bottom: 0 !important; margin-top: -10px; border-width: 0;
+      transition: height 0.3s ease, opacity 0.2s ease, transform 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+    }
+    @keyframes enter { from { opacity: 0; transform: translateY(-8px) scale(0.98); } to { opacity: 1; transform: none; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    @media (max-width: 480px) {
+      .app-header h1 { font-size: 28px; }
+      .hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="mockup-bar">
+      <strong>Mockup v1</strong> — design preview only, not the real app. Click a card to edit it. Tick, delete and add all animate.
+      <span class="spacer"></span>
+      <button id="toggle-empty">Show empty state</button>
+    </div>
+
+    <header class="app-header">
+      <div>
+        <h1>Notes</h1>
+        <p class="subtitle" id="today-label"></p>
+      </div>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode"></button>
+    </header>
+
+    <form class="composer" id="composer">
+      <textarea class="note-input" id="composer-input" rows="1" placeholder="What's on your mind?"></textarea>
+      <div class="input-row" id="composer-row">
+        <span class="spacer"></span>
+        <span class="hint"><kbd>Enter</kbd> to save · <kbd>Shift</kbd>+<kbd>Enter</kbd> new line</span>
+        <button type="submit" class="btn primary" id="composer-add" disabled></button>
+      </div>
+    </form>
+
+    <main id="list-root"></main>
+  </div>
+
+  <div class="toast" id="toast" role="status">
+    <span>Note deleted</span>
+    <button id="undo">Undo</button>
+  </div>
+
+  <script>
+    // ---------- Icons ----------
+    const ICONS = {
+      check: '<path d="M20 6 9 17l-5-5"/>',
+      pencil: '<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+      trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+      calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+      clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+      alert: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+      sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+      moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+      plus: '<path d="M5 12h14M12 5v14"/>',
+      x: '<path d="M18 6 6 18M6 6l12 12"/>',
+      chevron: '<path d="m6 9 6 6 6-6"/>',
+    };
+    const icon = (name) => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
+
+    // ---------- Dates ----------
+    const pad = (n) => String(n).padStart(2, '0');
+    const toISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const offset = (days) => { const d = new Date(today); d.setDate(d.getDate() + days); return toISO(d); };
+
+    function dateTag(date, time) {
+      const d = new Date(date + 'T00:00');
+      const diff = Math.round((d - today) / 86400000);
+      const short = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      let kind, label, ic;
+      if (diff < 0) { kind = 'overdue'; label = `Overdue · ${short}`; ic = 'alert'; }
+      else if (diff === 0) { kind = 'today'; label = 'Today'; ic = 'clock'; }
+      else if (diff === 1) { kind = 'upcoming'; label = 'Tomorrow'; ic = 'calendar'; }
+      else { kind = 'upcoming'; label = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }); ic = 'calendar'; }
+      if (time) label += ` · ${time}`;
+      return `<span class="tag ${kind}">${icon(ic)}${label}</span>`;
+    }
+
+    document.getElementById('today-label').textContent =
+      today.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+    // ---------- Sample data ----------
+    let nextId = 100;
+    let notes = [
+      { id: 1, text: 'Call the dentist\nAsk if they can move Thursday’s appointment to next week.', date: offset(0), time: '14:00', done: false },
+      { id: 2, text: 'Renew passport', date: offset(-3), time: null, done: false },
+      { id: 3, text: 'Weekend groceries\nOat milk, lemons, sourdough\nBasil, parmesan, cherry tomatoes', date: offset(2), time: null, done: false },
+      { id: 4, text: 'Gift ideas for Sam\nThat ceramic pour-over set, or a good pair of running socks.', date: null, time: null, done: false },
+      { id: 5, text: 'Water the plants', date: null, time: null, done: true },
+    ];
+    let editingId = null;
+    let showEmpty = false;
+    let completedCollapsed = false;
+    let lastDeleted = null;
+    let toastTimer = null;
+
+    const listRoot = document.getElementById('list-root');
+
+    // ---------- Shared input behaviour ----------
+    function autoGrow(ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+
+    // Enter saves, Shift+Enter inserts a newline, Escape cancels.
+    function wireInput(ta, onSave, onCancel) {
+      ta.addEventListener('input', () => autoGrow(ta));
+      ta.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); onSave(); }
+        if (e.key === 'Escape' && onCancel) { e.preventDefault(); onCancel(); }
+      });
+    }
+
+    // Date chip + date/time inputs. Returns { el, get() }.
+    function dateControl(date, time) {
+      const wrap = document.createElement('span');
+      wrap.style.display = 'contents';
+      wrap.innerHTML = `
+        <button type="button" class="chip">${icon('calendar')}<span>Date</span></button>
+        <span class="date-fields">
+          <input type="date" /><input type="time" />
+          <button type="button" class="icon-btn" aria-label="Clear date" style="width:28px;height:28px">${icon('x')}</button>
+        </span>`;
+      const chip = wrap.querySelector('.chip');
+      const fields = wrap.querySelector('.date-fields');
+      const [dIn, tIn] = wrap.querySelectorAll('input');
+      const clear = fields.querySelector('.icon-btn');
+      const setOpen = (open) => { fields.classList.toggle('open', open); chip.classList.toggle('active', open); };
+      dIn.value = date || ''; tIn.value = time || '';
+      setOpen(!!date);
+      chip.addEventListener('click', () => { setOpen(!fields.classList.contains('open')); if (fields.classList.contains('open')) dIn.focus(); });
+      clear.addEventListener('click', () => { dIn.value = ''; tIn.value = ''; setOpen(false); });
+      return {
+        el: wrap,
+        get: () => fields.classList.contains('open') && dIn.value ? { date: dIn.value, time: tIn.value || null } : { date: null, time: null },
+        reset: () => { dIn.value = ''; tIn.value = ''; setOpen(false); },
+      };
+    }
+
+    // ---------- Composer ----------
+    const composer = document.getElementById('composer');
+    const composerInput = document.getElementById('composer-input');
+    const composerAdd = document.getElementById('composer-add');
+    const composerDate = dateControl(null, null);
+    document.getElementById('composer-row').prepend(composerDate.el);
+    composerAdd.innerHTML = `${icon('plus')}Add`;
+
+    function addFromComposer() {
+      const text = composerInput.value.trim();
+      if (!text) return;
+      const { date, time } = composerDate.get();
+      const note = { id: nextId++, text, date, time, done: false };
+      notes.unshift(note);
+      showEmpty = false;
+      composerInput.value = ''; autoGrow(composerInput);
+      composerDate.reset();
+      composerAdd.disabled = true;
+      render({ enterId: note.id });
+      composerInput.focus();
+    }
+    wireInput(composerInput, addFromComposer);
+    composerInput.addEventListener('input', () => { composerAdd.disabled = !composerInput.value.trim(); });
+    composer.addEventListener('submit', (e) => { e.preventDefault(); addFromComposer(); });
+
+    // ---------- Rendering ----------
+    function render({ enterId = null } = {}) {
+      listRoot.innerHTML = '';
+      if (showEmpty || notes.length === 0) {
+        listRoot.innerHTML = `
+          <div class="empty">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="62" r="46" fill="var(--accent-soft)"/>
+              <rect x="38" y="30" width="44" height="56" rx="8" fill="var(--surface)" stroke="var(--border)" />
+              <rect x="46" y="44" width="28" height="4" rx="2" fill="var(--text-3)" opacity=".6"/>
+              <rect x="46" y="54" width="22" height="4" rx="2" fill="var(--text-3)" opacity=".4"/>
+              <rect x="46" y="64" width="25" height="4" rx="2" fill="var(--text-3)" opacity=".4"/>
+              <path d="M88 26l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="var(--accent)"/>
+              <path d="M30 80l1.6 3.4 3.4 1.6-3.4 1.6L30 90l-1.6-3.4L25 85l3.4-1.6z" fill="var(--accent)" opacity=".6"/>
+            </svg>
+            <h2>A clean slate</h2>
+            <p>Nothing here yet. Jot down your first thought above,<br />and add a date if it’s something to remember.</p>
+          </div>`;
+        return;
+      }
+
+      const active = notes.filter((n) => !n.done);
+      const done = notes.filter((n) => n.done);
+
+      const activeList = document.createElement('div');
+      activeList.className = 'list';
+      active.forEach((n) => activeList.appendChild(renderCard(n, n.id === enterId)));
+      listRoot.appendChild(activeList);
+
+      if (done.length) {
+        const label = document.createElement('button');
+        label.className = 'section-label' + (completedCollapsed ? ' collapsed' : '');
+        label.innerHTML = `${icon('chevron')}Completed · ${done.length}`;
+        label.addEventListener('click', () => { completedCollapsed = !completedCollapsed; render(); });
+        listRoot.appendChild(label);
+        if (!completedCollapsed) {
+          const doneList = document.createElement('div');
+          doneList.className = 'list';
+          done.forEach((n) => doneList.appendChild(renderCard(n, n.id === enterId)));
+          listRoot.appendChild(doneList);
+        }
+      }
+    }
+
+    function renderCard(note, entering) {
+      if (note.id === editingId) return renderEditor(note);
+
+      const [title, ...rest] = note.text.split('\n');
+      const card = document.createElement('article');
+      card.className = 'card' + (note.done ? ' done' : '') + (entering ? ' enter' : '');
+      card.innerHTML = `
+        <button class="check" aria-label="${note.done ? 'Mark not done' : 'Mark done'}">${icon('check')}</button>
+        <div class="content">
+          <div class="title"></div>
+          ${rest.length ? '<div class="body"></div>' : ''}
+          ${note.date ? `<div class="tags">${dateTag(note.date, note.time)}</div>` : ''}
+        </div>
+        <div class="actions">
+          <button class="icon-btn edit" aria-label="Edit">${icon('pencil')}</button>
+          <button class="icon-btn danger delete" aria-label="Delete">${icon('trash')}</button>
+        </div>`;
+      card.querySelector('.title').textContent = title;
+      if (rest.length) card.querySelector('.body').textContent = rest.join('\n');
+
+      card.querySelector('.check').addEventListener('click', (e) => { e.stopPropagation(); toggleDone(note, card); });
+      card.querySelector('.delete').addEventListener('click', (e) => { e.stopPropagation(); deleteNote(note, card); });
+      card.addEventListener('click', () => { editingId = note.id; render(); });
+      return card;
+    }
+
+    function renderEditor(note) {
+      const card = document.createElement('article');
+      card.className = 'card editing';
+      card.innerHTML = `
+        <div class="editor">
+          <textarea class="note-input" rows="1"></textarea>
+          <div class="input-row">
+            <span class="spacer"></span>
+            <span class="hint"><kbd>Enter</kbd> to save · <kbd>Esc</kbd> to cancel</span>
+            <button type="button" class="btn ghost cancel">Cancel</button>
+            <button type="button" class="btn primary save">Save</button>
+          </div>
+        </div>`;
+      const ta = card.querySelector('textarea');
+      const dc = dateControl(note.date, note.time);
+      card.querySelector('.input-row').prepend(dc.el);
+      ta.value = note.text;
+
+      const save = () => {
+        const text = ta.value.trim();
+        if (!text) return;
+        Object.assign(note, { text }, dc.get());
+        editingId = null; render();
+      };
+      const cancel = () => { editingId = null; render(); };
+      wireInput(ta, save, cancel);
+      card.querySelector('.save').addEventListener('click', save);
+      card.querySelector('.cancel').addEventListener('click', cancel);
+
+      requestAnimationFrame(() => { autoGrow(ta); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); });
+      return card;
+    }
+
+    // ---------- Actions with motion ----------
+    function leave(card, done) {
+      card.style.height = card.offsetHeight + 'px';
+      card.offsetHeight; // force reflow so the height transition starts from here
+      card.classList.add('leaving');
+      card.style.height = '0px';
+      setTimeout(done, 300);
+    }
+
+    function toggleDone(note, card) {
+      note.done = !note.done;
+      card.classList.toggle('done', note.done);
+      const check = card.querySelector('.check');
+      check.classList.remove('pop'); check.offsetWidth; check.classList.add('pop');
+      // Let the tick + strikethrough register, then move the card to its section.
+      setTimeout(() => leave(card, () => render({ enterId: note.id })), 450);
+    }
+
+    function deleteNote(note, card) {
+      const index = notes.indexOf(note);
+      leave(card, () => {
+        notes = notes.filter((n) => n !== note);
+        lastDeleted = { note, index };
+        render();
+        showToast();
+      });
+    }
+
+    const toast = document.getElementById('toast');
+    function showToast() {
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { toast.classList.remove('show'); lastDeleted = null; }, 5000);
+    }
+    document.getElementById('undo').addEventListener('click', () => {
+      if (!lastDeleted) return;
+      notes.splice(lastDeleted.index, 0, lastDeleted.note);
+      const id = lastDeleted.note.id;
+      lastDeleted = null;
+      clearTimeout(toastTimer);
+      toast.classList.remove('show');
+      render({ enterId: id });
+    });
+
+    // ---------- Theme toggle ----------
+    const themeBtn = document.getElementById('theme-toggle');
+    const isDark = () => {
+      const t = document.documentElement.dataset.theme;
+      return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    };
+    const paintThemeBtn = () => { themeBtn.innerHTML = icon(isDark() ? 'sun' : 'moon'); };
+    try { const saved = localStorage.getItem('mockup-theme'); if (saved) document.documentElement.dataset.theme = saved; } catch (e) {}
+    themeBtn.addEventListener('click', () => {
+      const next = isDark() ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('mockup-theme', next); } catch (e) {}
+      paintThemeBtn();
+    });
+    paintThemeBtn();
+
+    // ---------- Mockup-only control ----------
+    const emptyBtn = document.getElementById('toggle-empty');
+    emptyBtn.addEventListener('click', () => {
+      showEmpty = !showEmpty;
+      emptyBtn.textContent = showEmpty ? 'Show sample notes' : 'Show empty state';
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

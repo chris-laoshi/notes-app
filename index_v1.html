@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notes</title>
+  <link rel="stylesheet" href="styles_v1.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="app-header">
+      <h1>Notes</h1>
+    </header>
+
+    <form id="quick-add" class="quick-add">
+      <input
+        id="quick-add-text"
+        type="text"
+        placeholder="Type a note..."
+        autocomplete="off"
+        required
+      />
+      <div class="quick-add-row">
+        <label class="date-toggle">
+          <input type="checkbox" id="quick-add-date-toggle" />
+          Add date
+        </label>
+        <input type="date" id="quick-add-date" class="hidden" />
+        <input type="time" id="quick-add-time" class="hidden" />
+        <button type="submit">Add</button>
+      </div>
+    </form>
+
+    <section id="notes-list" class="notes-list"></section>
+  </div>
+
+  <div id="undo-toast" class="undo-toast hidden">
+    <span id="undo-message"></span>
+    <button id="undo-button">Undo</button>
+  </div>
+
+  <script type="module" src="app_v1.js"></script>
+</body>
+</html>
